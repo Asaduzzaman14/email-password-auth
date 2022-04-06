@@ -1,32 +1,40 @@
 import './App.css';
 import app from './firebase.init';
-import { getAuth } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { Button, Form } from 'react-bootstrap';
+import { useState } from 'react';
 
 
 const auth = getAuth(app)
 
 function App() {
+  const [email, setEmail] = useState('')
+  const [pass, setPass] = useState('')
 
   const handeelEmailBlur = (e) => {
-    console.log(e.target.value);
+    setEmail(e.target.value);
   }
   const handelpassBlur = (e) => {
-    console.log(e.target.value);
+    setPass(e.target.value);
   }
 
-  const formSubmited = (e) => {
+  const hanelformSubmit = (e) => {
+
+    createUserWithEmailAndPassword(auth, email, pass)
+      .then(result => {
+        console.log(result.user);
+      })
+      .catch(err => console.log(err))
     e.preventDefault()
-    console.log('submited');
   }
 
 
   return (
-    <div className='w-50 mt-3 mx-auto'>
+    <div className='w-50 mt-4 mx-auto'>
       <h1 className='text-primary'>Please Registar</h1>
-      <Form onSubmit={formSubmited}>
+      <Form onSubmit={hanelformSubmit}>
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Label>Email address</Form.Label>
           <Form.Control onBlur={handeelEmailBlur} type="email" placeholder="Enter email" />
@@ -39,9 +47,7 @@ function App() {
           <Form.Label>Password</Form.Label>
           <Form.Control onBlur={handelpassBlur} type="password" placeholder="Password" />
         </Form.Group>
-        <Form.Group className="mb-3" controlId="formBasicCheckbox">
-          <Form.Check type="checkbox" label="Check me out" />
-        </Form.Group>
+
         <Button variant="primary" type="submit">
           Submit
         </Button>
