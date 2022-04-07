@@ -1,6 +1,6 @@
 import './App.css';
 import app from './firebase.init';
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { Button, Form } from 'react-bootstrap';
@@ -43,17 +43,34 @@ function App() {
     setValidated(true);
     setError('')
 
-    createUserWithEmailAndPassword(auth, email, pass)
-      .then(result => {
-        console.log(result.user);
-        setEmail('')
-        setPass('')
-      })
-      .catch(err => {
-        console.log(err)
-        setError(err.massage)
+    if (register) {
+      signInWithEmailAndPassword(auth, email, pass)
+        .then((result) => {
+          console.log(result.user);
+          console.log('login success');
 
-      })
+        })
+        .catch((err) => {
+          console.log(err);
+          setError(err.message)
+        })
+
+    } else {
+      createUserWithEmailAndPassword(auth, email, pass)
+        .then(result => {
+          console.log(result.user);
+          console.log('register success');
+          setEmail('')
+          setPass('')
+        })
+        .catch(err => {
+          console.log(err)
+          setError(err.message)
+
+        })
+    }
+
+
 
     event.preventDefault();
   };
