@@ -12,7 +12,13 @@ const auth = getAuth(app)
 function App() {
   const [email, setEmail] = useState('')
   const [pass, setPass] = useState('')
+  const [error, setError] = useState('')
+  const [validated, setValidated] = useState(false);
+  const [register, setRegistar] = useState(false)
 
+  const handelRegister = (event) => {
+    setRegistar(event.target.checked)
+  }
   const handeelEmailBlur = (e) => {
     setEmail(e.target.value);
   }
@@ -20,36 +26,73 @@ function App() {
     setPass(e.target.value);
   }
 
-  const hanelformSubmit = (e) => {
+  const hanelformSubmit = (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      return
+    }
+
+    if (!/(?=.*[!@#$%^&*])/.test(pass)) {
+      setError('password should contain at least one spacial carecter')
+
+      return
+    }
+    setValidated(true);
+    setError('')
 
     createUserWithEmailAndPassword(auth, email, pass)
       .then(result => {
         console.log(result.user);
+        setEmail('')
+        setPass('')
       })
-      .catch(err => console.log(err))
-    e.preventDefault()
-  }
+      .catch(err => {
+        console.log(err)
+        setError(err.massage)
+
+      })
+
+    event.preventDefault();
+  };
+
 
 
   return (
+
+
     <div className='w-50 mt-4 mx-auto'>
-      <h1 className='text-primary'>Please Registar</h1>
-      <Form onSubmit={hanelformSubmit}>
+      <h1 className='text-primary'>Please {register ? 'LogIn' : 'Register'} !!</h1>
+
+      <Form noValidate validated={validated} onSubmit={hanelformSubmit}>
+
+
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Label>Email address</Form.Label>
-          <Form.Control onBlur={handeelEmailBlur} type="email" placeholder="Enter email" />
+          <Form.Control onBlur={handeelEmailBlur} type="email" placeholder="Enter email" required />
           <Form.Text className="text-muted">
             We'll never share your email with anyone else.
           </Form.Text>
+          <Form.Control.Feedback type="invalid">
+            Please provide a valid email.
+          </Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="formBasicPassword">
           <Form.Label>Password</Form.Label>
-          <Form.Control onBlur={handelpassBlur} type="password" placeholder="Password" />
+          <Form.Control onBlur={handelpassBlur} type="password" placeholder="Password" required />
+          <Form.Control.Feedback type="invalid">
+            Please provide a valid password.
+          </Form.Control.Feedback>
         </Form.Group>
-
+        <Form.Group className="mb-3" controlId="formBasicCheckbox">
+          <Form.Check onChange={handelRegister} type="checkbox" label="Already Registered" />
+        </Form.Group>
+        <p className='text-danger'>{error}</p>
         <Button variant="primary" type="submit">
-          Submit
+          {register ? 'LogIn' : 'Register'}
         </Button>
       </Form>
     </div>
